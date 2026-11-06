@@ -1,0 +1,80 @@
+#!/bin/sh
+# The `sage` command for the Claude plugin: runs the sage CLI this plugin
+# pins, fetching it once from the plugin's GitHub release into the user's
+# cache and checking it against the digests the plugin carries.
+# SAGE_CLI names another binary to run instead.
+set -eu
+
+if [ -n "${SAGE_CLI:-}" ]; then
+  exec "$SAGE_CLI" "$@"
+fi
+
+fail() {
+  printf 'sage plugin: %s\n' "$*" >&2
+  exit 2
+}
+
+root=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+release="$root/release"
+[ -f "$release/TAG" ] || fail "no release pinned: $release/TAG is missing"
+tag=$(tr -d '[:space:]' < "$release/TAG")
+repo=$(tr -d '[:space:]' < "$release/REPO")
+
+case $(uname -s) in
+  Linux) os=linux ;;
+  Darwin) os=darwin ;;
+  *) fail "no sage build for $(uname -s); builds exist for Linux and macOS" ;;
+esac
+case $(uname -m) in
+  x86_64|amd64) arch=amd64 ;;
+  aarch64|arm64) arch=arm64 ;;
+  *) fail "no sage build for $(uname -m)" ;;
+esac
+asset=sage-$os-$arch
+[ "$os-$arch" != darwin-amd64 ] || fail "no sage build for Intel Macs yet"
+
+if [ -n "${SAGE_PLUGIN_CACHE_DIR:-}" ]; then
+  cache=$SAGE_PLUGIN_CACHE_DIR
+elif [ -n "${XDG_CACHE_HOME:-}" ]; then
+  cache=$XDG_CACHE_HOME/sage/plugin
+else
+  cache=${HOME:?HOME is not set}/.cache/sage/plugin
+fi
+bin=$cache/$tag/$asset
+
+if [ ! -x "$bin" ]; then
+  want=$(awk -v f="$asset" '$2 == f || $2 == "*" f { print $1 }' "$release/SHA256SUMS")
+  [ -n "$want" ] || fail "$release/SHA256SUMS has no digest for $asset"
+  mkdir -p "$cache/$tag"
+  part=$(mktemp "$cache/$tag/.$asset.XXXXXX")
+  trap 'rm -f "$part"' EXIT
+  printf 'sage plugin: fetching %s %s from github.com/%s\n' "$asset" "$tag" "$repo" >&2
+  # The repository is private: gh's login, else a token from the environment.
+  if command -v gh >/dev/null 2>&1 && gh release download "$tag" -R "$repo" -p "$asset" -O - > "$part" 2>/dev/null; then
+    :
+  else
+    token=${GH_TOKEN:-${GITHUB_TOKEN:-}}
+    [ -n "$token" ] || fail "cannot fetch $asset: sign in with \`gh auth login\` or set GH_TOKEN to a token that can read $repo"
+    command -v curl >/dev/null 2>&1 || fail "curl is required to fetch $asset"
+    api=https://api.github.com/repos/$repo
+    id=$(curl -fsSL -H "Authorization: Bearer $token" "$api/releases/tags/$tag" |
+      tr ',{' '\n\n' | awk -v f="\"$asset\"" '
+        /"url":/ && /\/releases\/assets\// { gsub(/.*\/assets\/|"/, ""); id = $0 }
+        /"name":/ && index($0, f) { print id; exit }') ||
+      fail "cannot read release $tag of $repo"
+    [ -n "$id" ] || fail "release $tag of $repo has no $asset"
+    curl -fsSL -H "Authorization: Bearer $token" -H 'Accept: application/octet-stream' \
+      "$api/releases/assets/$id" > "$part" || fail "cannot download $asset"
+  fi
+  if command -v sha256sum >/dev/null 2>&1; then
+    got=$(sha256sum "$part" | awk '{print $1}')
+  else
+    got=$(shasum -a 256 "$part" | awk '{print $1}')
+  fi
+  [ "$got" = "$want" ] || fail "$asset from $tag has digest $got, the plugin expects $want"
+  chmod 755 "$part"
+  mv -f "$part" "$bin"
+  trap - EXIT
+fi
+
+exec "$bin" "$@"

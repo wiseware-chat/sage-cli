@@ -1,0 +1,12 @@
+{
+  "name": "sage",
+  "description": "The sage CLI for Markdown folders and Sage drives",
+  "owner": { "name": "Wiseware" },
+  "plugins": [
+    {
+      "name": "sage",
+      "source": "./plugin",
+      "description": "Search, read and check Markdown folders and Sage drives with the sage CLI."
+    }
+  ]
+}

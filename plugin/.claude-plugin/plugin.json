@@ -1,0 +1,9 @@
+{
+  "name": "sage",
+  "version": "0.1.0-79f29eb",
+  "description": "Search, read and check Markdown folders and Sage drives with the sage CLI.",
+  "author": {
+    "name": "Wiseware"
+  },
+  "repository": "https://github.com/wiseware-chat/sage-cli"
+}
