@@ -1,0 +1,37 @@
+Sage CLI and Claude plugin — beta license
+
+Copyright (c) 2026 Wiseware. All rights reserved.
+
+This license covers the sage command-line binaries published as releases of
+this repository and the Claude plugin in it (together, "the Software").
+
+1. Beta. The Software is a pre-release beta, offered for evaluation and
+   testing. It may be incomplete, contain errors, lose or alter data, and
+   change or stop working between releases without notice. Keep your own
+   backups of anything you use it on.
+
+2. Use. You may download, install and use the Software free of charge, for
+   any purpose, on any number of machines, and share unmodified copies of it
+   together with this license. The Sage source code is not part of this
+   release and no rights to it are granted.
+
+3. Restrictions. You may not sell the Software, offer it as a service of
+   your own, remove this license, or represent it as your own work.
+
+4. No warranty. THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT
+   WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+   WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, ACCURACY
+   AND NON-INFRINGEMENT. YOU USE IT ENTIRELY AT YOUR OWN RISK.
+
+5. No liability. TO THE FULLEST EXTENT PERMITTED BY LAW, IN NO EVENT SHALL
+   WISEWARE OR ITS CONTRIBUTORS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER DIRECT, INDIRECT, INCIDENTAL, SPECIAL OR CONSEQUENTIAL,
+   INCLUDING LOSS OF DATA, PROFITS OR BUSINESS, ARISING FROM, OUT OF OR IN
+   CONNECTION WITH THE SOFTWARE OR ITS USE, EVEN IF ADVISED OF THE
+   POSSIBILITY OF SUCH DAMAGES.
+
+6. No support. Wiseware has no obligation to provide support, updates or
+   fixes, or to keep the Software or this repository available.
+
+7. Changes. Wiseware may change this license for later releases, or end the
+   beta, at any time. Each release is covered by the license it ships with.

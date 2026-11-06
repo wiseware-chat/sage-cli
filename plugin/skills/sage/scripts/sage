@@ -23,6 +23,7 @@ repo=$(tr -d '[:space:]' < "$release/REPO")
 case $(uname -s) in
   Linux) os=linux ;;
   Darwin) os=darwin ;;
+  MINGW*|MSYS*|CYGWIN*|Windows*) fail "Windows is not supported yet; under WSL, sage installs as on Linux" ;;
   *) fail "no sage build for $(uname -s); builds exist for Linux and macOS" ;;
 esac
 case $(uname -m) in
@@ -49,12 +50,19 @@ if [ ! -x "$bin" ]; then
   part=$(mktemp "$cache/$tag/.$asset.XXXXXX")
   trap 'rm -f "$part"' EXIT
   printf 'sage plugin: fetching %s %s from github.com/%s\n' "$asset" "$tag" "$repo" >&2
-  # The repository is private: gh's login, else a token from the environment.
-  if command -v gh >/dev/null 2>&1 && gh release download "$tag" -R "$repo" -p "$asset" -O - > "$part" 2>/dev/null; then
+  # The public download URL first; gh's login or a token from the environment
+  # when the repository is not public.
+  if command -v curl >/dev/null 2>&1 &&
+    curl -fsSL "https://github.com/$repo/releases/download/$tag/$asset" -o "$part" 2>/dev/null; then
+    :
+  elif command -v wget >/dev/null 2>&1 &&
+    wget -qO "$part" "https://github.com/$repo/releases/download/$tag/$asset" 2>/dev/null; then
+    :
+  elif command -v gh >/dev/null 2>&1 && gh release download "$tag" -R "$repo" -p "$asset" -O - > "$part" 2>/dev/null; then
     :
   else
     token=${GH_TOKEN:-${GITHUB_TOKEN:-}}
-    [ -n "$token" ] || fail "cannot fetch $asset: sign in with \`gh auth login\` or set GH_TOKEN to a token that can read $repo"
+    [ -n "$token" ] || fail "cannot fetch $asset from github.com/$repo: is the network reachable? (for a private repository, sign in with \`gh auth login\` or set GH_TOKEN)"
     command -v curl >/dev/null 2>&1 || fail "curl is required to fetch $asset"
     api=https://api.github.com/repos/$repo
     id=$(curl -fsSL -H "Authorization: Bearer $token" "$api/releases/tags/$tag" |

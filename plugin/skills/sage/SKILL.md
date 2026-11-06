@@ -10,9 +10,9 @@ and answers as one JSON object on stdout. The index refreshes itself on each
 call. Run it as `"${CLAUDE_SKILL_DIR}/scripts/sage"` (written `sage` below;
 a shell variable such as `sage="${CLAUDE_SKILL_DIR}/scripts/sage"` and then
 `"$sage" drive` saves repeating it). The first call downloads the pinned build
-into `~/.cache/sage/plugin`. The release lives in a private GitHub repository,
-so `gh auth login` or `GH_TOKEN` must give read access; `SAGE_CLI=/path/to/sage`
-runs a local build instead.
+from GitHub into `~/.cache/sage/plugin`, which needs network access once;
+`SAGE_CLI=/path/to/sage` runs a local build instead. Builds exist for macOS on
+Apple silicon and Linux (x86_64, arm64); Windows is not supported yet.
 
 ## Start here
 
@@ -37,8 +37,17 @@ runs a local build instead.
 
 ## Writing
 
+Before writing records by hand or changing anything under `.sage/` (types,
+schemas, templates, folders, rules, queries, relations), read
+`${CLAUDE_SKILL_DIR}/drives.md`: the exact format, CEL, links, the check's
+findings and the mistakes that are easy to make. Unknown keys in `.sage/` are
+ignored silently, so guessing the grammar fails quietly.
+
+
 - `sage new TYPE "Title" --set key=value` creates a record from the type's
   template, with its id, folder and filename, and prints what it still needs.
+  The value is YAML: a list field takes `--set 'profiles=[wetten]'`, since
+  `--set profiles=wetten` writes a string; `--set 'n="2"'` keeps a string.
 - After editing records, `sage check [PATHS]` is the gate: fix its errors
   before calling the work done (`--strict` also fails on warnings).
 - `sage render` writes the pages, rendered for reading, to `dist/`.
