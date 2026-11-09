@@ -1,5 +1,5 @@
 #!/bin/sh
-# Installs the sage CLI v0.1.0-5e8a513 from github.com/wiseware-chat/sage-cli into ~/.local/bin
+# Installs the sage CLI v0.1.0-9f18faa from github.com/wiseware-chat/sage-cli into ~/.local/bin
 # (SAGE_INSTALL_DIR chooses another folder) and, when Claude Code is on PATH,
 # adds the plugin's marketplace and installs the plugin.
 #
@@ -9,7 +9,7 @@
 set -eu
 
 repo=wiseware-chat/sage-cli
-tag=v0.1.0-5e8a513
+tag=v0.1.0-9f18faa
 dir=${SAGE_INSTALL_DIR:-${HOME:?HOME is not set}/.local/bin}
 
 say() { printf 'sage install: %s\n' "$*" >&2; }
