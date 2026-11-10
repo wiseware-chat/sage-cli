@@ -1,7 +1,8 @@
 #!/bin/sh
-# Installs the sage CLI v0.1.0-9f18faa from github.com/wiseware-chat/sage-cli into ~/.local/bin
+# Installs the sage CLI v0.1.0-899db5d from github.com/wiseware-chat/sage-cli into ~/.local/bin
 # (SAGE_INSTALL_DIR chooses another folder) and, when Claude Code is on PATH,
-# adds the plugin's marketplace and installs the plugin.
+# adds the plugin's marketplace and installs the plugin. With Codex on PATH it
+# says how to add the plugin there.
 #
 #   curl -fsSL https://raw.githubusercontent.com/wiseware-chat/sage-cli/main/install.sh | sh
 #
@@ -9,7 +10,7 @@
 set -eu
 
 repo=wiseware-chat/sage-cli
-tag=v0.1.0-9f18faa
+tag=v0.1.0-899db5d
 dir=${SAGE_INSTALL_DIR:-${HOME:?HOME is not set}/.local/bin}
 
 say() { printf 'sage install: %s\n' "$*" >&2; }
@@ -76,6 +77,9 @@ esac
 
 if [ "${SAGE_NO_PLUGIN:-}" = 1 ]; then
   exit 0
+fi
+if command -v codex >/dev/null 2>&1; then
+  say "for the Codex plugin, run \`codex plugin marketplace add $repo\` and install Sage from /plugins"
 fi
 if ! command -v claude >/dev/null 2>&1; then
   say "Claude Code is not on PATH; to add the plugin later, run in Claude Code:"

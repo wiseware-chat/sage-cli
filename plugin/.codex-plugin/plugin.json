@@ -1,0 +1,36 @@
+{
+  "name": "sage",
+  "version": "0.1.0-899db5d",
+  "description": "Search, read and file Markdown notes, Obsidian vaults and Sage drives, the card index your agent keeps, with the sage CLI.",
+  "author": {
+    "name": "Wiseware"
+  },
+  "homepage": "https://github.com/wiseware-chat/sage-cli",
+  "repository": "https://github.com/wiseware-chat/sage-cli",
+  "keywords": [
+    "markdown",
+    "notes",
+    "obsidian",
+    "wikilinks",
+    "frontmatter",
+    "sage"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Sage",
+    "shortDescription": "Your Markdown notes as a card index Codex keeps",
+    "longDescription": "Use the sage CLI from Codex on a folder of Markdown, an Obsidian vault or a Sage drive, kept as a card index: kinds of cards with their forms, tabs, house rules and standing lists. Full-text search, the [[wikilink]] graph, frontmatter records, a drive's named queries and its check, as JSON.",
+    "developerName": "Wiseware",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/wiseware-chat/sage-cli",
+    "defaultPrompt": [
+      "Use sage to find the notes in this folder about a topic and the notes they link to",
+      "Use sage to file these meeting notes as cards in this drive",
+      "Use sage to check this drive and fix the records it reports"
+    ]
+  }
+}

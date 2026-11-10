@@ -6,7 +6,7 @@
     {
       "name": "sage",
       "source": "./plugin",
-      "description": "Search, read and check Markdown folders and Sage drives with the sage CLI."
+      "description": "Search, read and file Markdown notes, Obsidian vaults and Sage drives, the card index your agent keeps, with the sage CLI."
     }
   ]
 }
