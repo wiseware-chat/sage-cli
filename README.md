@@ -6,7 +6,7 @@ Code, the Claude desktop app, Cowork) and ChatGPT (Codex in the desktop app
 and the Codex CLI). Point it at a folder of Markdown (notes, an Obsidian
 vault, a Sage drive) and the agent can search it, follow its links, query
 its frontmatter as data and check it, with every answer as JSON. The current
-release is `v0.1.0-899db5d`.
+release is `v0.1.0-d7e8ac2`.
 
 `sage` runs on **macOS (Apple silicon) and Linux** (x86_64 and arm64). Windows
 is not supported yet; under WSL, the Linux build works.
@@ -182,6 +182,21 @@ curl -fsSL https://raw.githubusercontent.com/wiseware-chat/sage-cli/main/install
 `SAGE_INSTALL_DIR` chooses another folder; `SAGE_NO_PLUGIN=1` skips the plugin.
 Running it again installs the release it names and updates the plugin.
 
+### Agent evals
+
+`SAGE_EVAL=1` also installs `sage-eval`, which runs graded tasks against
+agents over ACP and measures how they use `sage`, and `sagent`, Sage's own
+agent, which its `claude` agent runs. Each task runs in a [nono](https://nono.sh)
+sandbox, so install nono too:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/wiseware-chat/sage-cli/main/install.sh | SAGE_EVAL=1 sh
+sage-eval run experiment.yaml --dry-run
+```
+
+Its agents run the `sage` and `sagent` installed beside it, and give the sage
+variants the skill `sage-eval` carries.
+
 The plugins below do not need this: the first time the skill runs `sage`, it
 downloads the build for your machine from this repository's release into
 `~/.cache/sage/plugin` and checks its SHA-256 against the digest in the
@@ -298,7 +313,7 @@ which `xattr -d com.apple.quarantine sage-darwin-arm64` releases.
 ## The binaries on their own
 
 ```sh
-base=https://github.com/wiseware-chat/sage-cli/releases/download/v0.1.0-899db5d
+base=https://github.com/wiseware-chat/sage-cli/releases/download/v0.1.0-d7e8ac2
 curl -fsSL -O "$base/sage-darwin-arm64" -O "$base/SHA256SUMS"
 shasum -a 256 -c SHA256SUMS --ignore-missing
 chmod +x sage-darwin-arm64 && mv sage-darwin-arm64 ~/.local/bin/sage

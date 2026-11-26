@@ -1,6 +1,6 @@
 {
   "name": "sage",
-  "version": "0.1.0-899db5d",
+  "version": "0.1.0-d7e8ac2",
   "description": "Search, read and file Markdown notes, Obsidian vaults and Sage drives, the card index your agent keeps, with the sage CLI.",
   "author": {
     "name": "Wiseware"

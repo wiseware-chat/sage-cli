@@ -1,16 +1,17 @@
 #!/bin/sh
-# Installs the sage CLI v0.1.0-899db5d from github.com/wiseware-chat/sage-cli into ~/.local/bin
+# Installs the sage CLI v0.1.0-d7e8ac2 from github.com/wiseware-chat/sage-cli into ~/.local/bin
 # (SAGE_INSTALL_DIR chooses another folder) and, when Claude Code is on PATH,
 # adds the plugin's marketplace and installs the plugin. With Codex on PATH it
 # says how to add the plugin there.
 #
 #   curl -fsSL https://raw.githubusercontent.com/wiseware-chat/sage-cli/main/install.sh | sh
 #
-# SAGE_NO_PLUGIN=1 skips the plugin.
+# SAGE_NO_PLUGIN=1 skips the plugin. SAGE_EVAL=1 also installs sage-eval,
+# the eval runner, and sagent, Sage's agent, which its claude agent runs.
 set -eu
 
 repo=wiseware-chat/sage-cli
-tag=v0.1.0-899db5d
+tag=v0.1.0-d7e8ac2
 dir=${SAGE_INSTALL_DIR:-${HOME:?HOME is not set}/.local/bin}
 
 say() { printf 'sage install: %s\n' "$*" >&2; }
@@ -28,7 +29,8 @@ case $(uname -m) in
   *) fail "no sage build for $(uname -m)" ;;
 esac
 [ "$os-$arch" != darwin-amd64 ] || fail "no sage build for Intel Macs yet"
-asset=sage-$os-$arch
+bins=sage
+[ "${SAGE_EVAL:-}" != 1 ] || bins="sage sage-eval sagent"
 
 tmp=$(mktemp -d)
 trap 'rm -rf "$tmp"' EXIT
@@ -55,21 +57,26 @@ fetch() {
     "$api/releases/assets/$id" -o "$tmp/$1" || fail "cannot download $1"
 }
 
-say "fetching $asset $tag from github.com/$repo"
-fetch "$asset"
 fetch SHA256SUMS
-want=$(awk -v f="$asset" '$2 == f { print $1 }' "$tmp/SHA256SUMS")
-if command -v sha256sum >/dev/null 2>&1; then
-  got=$(sha256sum "$tmp/$asset" | awk '{print $1}')
-else
-  got=$(shasum -a 256 "$tmp/$asset" | awk '{print $1}')
-fi
-[ -n "$want" ] && [ "$got" = "$want" ] || fail "$asset has digest $got, SHA256SUMS says ${want:-nothing}"
-
 mkdir -p "$dir"
-chmod 755 "$tmp/$asset"
-mv -f "$tmp/$asset" "$dir/sage"
+for bin in $bins; do
+  asset=$bin-$os-$arch
+  say "fetching $asset $tag from github.com/$repo"
+  fetch "$asset"
+  want=$(awk -v f="$asset" '$2 == f { print $1 }' "$tmp/SHA256SUMS")
+  if command -v sha256sum >/dev/null 2>&1; then
+    got=$(sha256sum "$tmp/$asset" | awk '{print $1}')
+  else
+    got=$(shasum -a 256 "$tmp/$asset" | awk '{print $1}')
+  fi
+  [ -n "$want" ] && [ "$got" = "$want" ] || fail "$asset has digest $got, SHA256SUMS says ${want:-nothing}"
+  chmod 755 "$tmp/$asset"
+  mv -f "$tmp/$asset" "$dir/$bin"
+done
 say "installed $("$dir/sage" --version) as $dir/sage"
+case " $bins " in
+  *" sage-eval "*) say "installed sage-eval and sagent beside it; sage-eval also needs nono (https://nono.sh)" ;;
+esac
 case ":$PATH:" in
   *":$dir:"*) ;;
   *) say "$dir is not on PATH; add it to your shell's profile" ;;
